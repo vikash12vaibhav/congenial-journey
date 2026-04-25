@@ -1,0 +1,797 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="h.css">
+<script src="h.js"></script>
+</head>
+<body>
+
+<!-- LANDING -->
+<div id="screen-landing" class="screen active">
+  <div class="grid-bg"></div>
+  <div class="landing-center">
+    <div class="logo-mark">🔐</div>
+    <h1 class="landing-title">Decentralized <span>Student Identity</span> & Verification</h1>
+    <p class="landing-sub">A unified platform where students own verified digital credentials, recruiters trust documents instantly, and universities act as trusted issuers.</p>
+    <div class="role-cards">
+      <div class="role-card" onclick="selectRole('student')">
+        <div class="role-icon">🎓</div>
+        <div class="role-label">Module 01</div>
+        <div class="role-name">Student</div>
+      </div>
+      <div class="role-card recruiter" onclick="selectRole('recruiter')">
+        <div class="role-icon">💼</div>
+        <div class="role-label">Module 02</div>
+        <div class="role-name">Recruiter</div>
+      </div>
+      <div class="role-card university" onclick="selectRole('university')">
+        <div class="role-icon">🏛️</div>
+        <div class="role-label">Module 03</div>
+        <div class="role-name">University</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;">
+      <span class="tag">🔒 JWT Auth</span>
+      <span class="tag">⛓ UUID Identity</span>
+      <span class="tag">🤖 AI Verification</span>
+      <span class="tag">📄 PDF Storage</span>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div id="screen-auth" class="screen">
+  <div class="auth-box">
+    <div class="auth-back" onclick="goBack()">← Back</div>
+    <div id="auth-role-badge" class="auth-role-badge">🎓 Student Login</div>
+    <h2 class="auth-title" id="auth-title">Sign In</h2>
+    <p class="auth-sub" id="auth-sub">Enter your mobile number to receive an OTP</p>
+
+    <!-- Step 1: Phone -->
+    <div id="auth-step-phone">
+      <div class="field-group">
+        <div class="field-label">Mobile Number</div>
+        <div class="phone-row">
+          <div class="phone-prefix">+91</div>
+          <input class="field-input" id="phone-input" type="tel" placeholder="98765 43210" maxlength="10">
+        </div>
+      </div>
+      <!-- University extra fields -->
+      <div id="univ-extra" style="display:none">
+        <div class="field-group">
+          <div class="field-label">Institution Name</div>
+          <input class="field-input" id="univ-name-input" type="text" placeholder="e.g. IIT Bombay">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Government Auth Code</div>
+          <input class="field-input" id="univ-code-input" type="text" placeholder="NAAC/UGC code">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="sendOTP()">Send OTP →</button>
+    </div>
+
+    <!-- Step 2: OTP -->
+    <div id="auth-step-otp" style="display:none">
+      <div class="field-group">
+        <div class="field-label">Enter 6-digit OTP</div>
+        <div class="otp-grid">
+          <input class="otp-cell field-input" type="tel" maxlength="1" oninput="otpNext(this,0)">
+          <input class="otp-cell field-input" type="tel" maxlength="1" oninput="otpNext(this,1)">
+          <input class="otp-cell field-input" type="tel" maxlength="1" oninput="otpNext(this,2)">
+          <input class="otp-cell field-input" type="tel" maxlength="1" oninput="otpNext(this,3)">
+          <input class="otp-cell field-input" type="tel" maxlength="1" oninput="otpNext(this,4)">
+          <input class="otp-cell field-input" type="tel" maxlength="1" oninput="otpNext(this,5)">
+        </div>
+      </div>
+      <div class="otp-hint">Demo OTP is <strong>123456</strong> — <span onclick="fillDemoOTP()">autofill</span></div>
+      <button class="btn btn-primary" style="margin-top:1rem" onclick="verifyOTP()">Verify & Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- STUDENT DASHBOARD -->
+<div id="screen-student" class="screen">
+  <div class="dash-shell">
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <div style="width:28px;height:28px;background:linear-gradient(135deg,var(--accent-blue),var(--accent-violet));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px">🔐</div>
+          <div class="sidebar-logo-name">EduVerify</div>
+        </div>
+        <div class="sidebar-logo-sub">Student Portal</div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Overview</div>
+        <div class="nav-item active" onclick="navTo('s-dashboard',this)"><div class="nav-dot"></div>🏠 Dashboard</div>
+        <div class="nav-item" onclick="navTo('s-identity',this)"><div class="nav-dot"></div>🪪 My Identity</div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Academic</div>
+        <div class="nav-item" onclick="navTo('s-class10',this)"><div class="nav-dot"></div>📚 Class 10</div>
+        <div class="nav-item" onclick="navTo('s-class12',this)"><div class="nav-dot"></div>📗 Class 12</div>
+        <div class="nav-item" onclick="navTo('s-college',this)"><div class="nav-dot"></div>🎓 College</div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Certificates</div>
+        <div class="nav-item" onclick="navTo('s-certs',this)"><div class="nav-dot"></div>🏆 My Certificates</div>
+        <div class="nav-item" onclick="navTo('s-verify-cert',this)"><div class="nav-dot"></div>🔍 Verify Certificate</div>
+      </div>
+      <div class="sidebar-footer">
+        <div class="user-pill">
+          <div class="user-avatar">A</div>
+          <div>
+            <div class="user-name">Aryan Sharma</div>
+            <div class="user-role">student</div>
+          </div>
+          <div class="logout-btn" onclick="logout()">↩</div>
+        </div>
+      </div>
+    </div>
+    <div class="main-area">
+      <div class="main-inner">
+
+        <!-- s-dashboard -->
+        <div class="page active" id="s-dashboard">
+          <div class="page-header">
+            <h1 class="page-title">Welcome back, Aryan 👋</h1>
+            <p class="page-sub">Your verified digital identity dashboard</p>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-card"><div class="stat-val" style="color:var(--accent-blue)">3/4</div><div class="stat-label">Records Verified</div></div>
+            <div class="stat-card"><div class="stat-val" style="color:var(--green)">2</div><div class="stat-label">Certificates</div></div>
+            <div class="stat-card"><div class="stat-val" style="color:var(--accent-violet)">12</div><div class="stat-label">Profile Views</div></div>
+            <div class="stat-card"><div class="stat-val" style="color:var(--accent-amber)">87%</div><div class="stat-label">Trust Score</div></div>
+          </div>
+          <div class="verify-section">
+            <div class="verify-header">
+              <div class="verify-title">🆔 Unique Student ID</div>
+              <div class="dot-live"></div>
+            </div>
+            <div class="id-label">Your Decentralized Identity</div>
+            <div class="id-display">
+              <span>STU-A8F3-2D91-7C45-E6B2</span>
+              <button class="btn btn-ghost btn-sm" onclick="copyUID()">Copy</button>
+            </div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:1rem">Share this ID with recruiters to let them view your verified records.</div>
+            <div style="margin-bottom:8px;font-size:12px;color:var(--muted);font-family:var(--font-mono)">PROFILE COMPLETENESS</div>
+            <div class="progress-bar-wrap"><div class="progress-bar" style="width:87%"></div></div>
+            <div style="font-size:11px;color:var(--muted);margin-top:6px;font-family:var(--font-mono)">87% — Add college documents to reach 100%</div>
+          </div>
+          <div class="verify-section">
+            <div class="verify-header"><div class="verify-title">📋 Verification Status</div></div>
+            <table class="data-table">
+              <thead><tr><th>Record</th><th>Status</th><th>Last Updated</th></tr></thead>
+              <tbody>
+                <tr><td>Class 10 — CBSE</td><td><span class="status-badge badge-verified">✓ Verified</span></td><td>Jan 2024</td></tr>
+                <tr><td>Class 12 — CBSE</td><td><span class="status-badge badge-verified">✓ Verified</span></td><td>Jan 2024</td></tr>
+                <tr><td>B.Tech — IIT Bombay</td><td><span class="status-badge badge-pending">⏳ Pending</span></td><td>Mar 2024</td></tr>
+                <tr><td>AWS Certificate</td><td><span class="status-badge badge-verified">✓ Verified</span></td><td>Feb 2024</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- s-identity -->
+        <div class="page" id="s-identity">
+          <div class="page-header"><h1 class="page-title">🪪 My Identity</h1><p class="page-sub">Your unique decentralized student profile</p></div>
+          <div class="profile-hero" style="display:flex; justify-content: space-between; align-items: center;">
+            <div style="display:flex; gap:16px; align-items:center;">
+              <div class="profile-avatar">A</div>
+              <div>
+                <div class="profile-name">Aryan Sharma</div>
+                <div class="profile-id-row">
+                  <span class="profile-uid">STU-A8F3-2D91-7C45-E6B2</span>
+                  <span class="status-badge badge-verified">✓ Active</span>
+                </div>
+                <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+                  <span class="chip">📱 +91 98765 43210</span>
+                  <span class="chip">🎓 B.Tech CSE</span>
+                  <span class="chip">📍 Mumbai, IN</span>
+                </div>
+              </div>
+            </div>
+            <img id="student-qr-code" src="" alt="QR Code" style="width: 100px; height: 100px; border-radius: 8px; background: #fff; padding: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+          </div>
+          <div class="verify-section">
+            <div class="verify-header"><div class="verify-title">🔐 Identity Metadata</div></div>
+            <table class="data-table">
+              <thead><tr><th>Field</th><th>Value</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td style="color:var(--muted);font-family:var(--font-mono);font-size:11px">UUID</td><td style="font-family:var(--font-mono);font-size:12px">a8f32d91-7c45-e6b2-9f1a-3c7d890ef123</td><td><span class="status-badge badge-verified">Active</span></td></tr>
+                <tr><td style="color:var(--muted);font-family:var(--font-mono);font-size:11px">Created</td><td>Jan 15, 2024</td><td>—</td></tr>
+                <tr><td style="color:var(--muted);font-family:var(--font-mono);font-size:11px">JWT Token</td><td style="font-family:var(--font-mono);font-size:11px">eyJhbGci...Xyz (expires in 6h)</td><td><span class="status-badge badge-info">Valid</span></td></tr>
+                <tr><td style="color:var(--muted);font-family:var(--font-mono);font-size:11px">Encryption</td><td>AES-256-GCM</td><td><span class="status-badge badge-verified">Active</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- s-class10 -->
+        <div class="page" id="s-class10">
+          <div class="page-header"><h1 class="page-title">📚 Class 10 Verification</h1><p class="page-sub">Verify your secondary school records</p></div>
+          <div class="verify-section">
+            <div class="verify-header">
+              <div class="verify-title">School Details</div>
+              <span class="status-badge badge-verified">✓ Verified</span>
+            </div>
+            <div class="form-row">
+              <div>
+                <div class="field-mini-label">School Name</div>
+                <input class="field-input" value="Delhi Public School, R.K. Puram" readonly>
+              </div>
+              <div>
+                <div class="field-mini-label">Roll Number</div>
+                <input class="field-input" value="CBSE/2019/0034521" readonly>
+              </div>
+            </div>
+            <div class="inline-verify-row">
+              <span class="status-badge badge-verified">✓ Matched with CBSE Database</span>
+              <span class="inline-verify-result" style="color:var(--muted)">Verified on Jan 15, 2024</span>
+            </div>
+          </div>
+          <div class="verify-section">
+            <div class="verify-header">
+              <div class="verify-title">Document Upload</div>
+              <span class="status-badge badge-verified">✓ Authenticated</span>
+            </div>
+            <div class="upload-zone" style="border-color:var(--green);background:rgba(34,200,122,0.04)">
+              <div class="upload-zone-icon">✅</div>
+              <div class="upload-zone-text" style="color:var(--green)">Marksheet_Class10_CBSE.pdf uploaded</div>
+              <div class="upload-zone-hint">AI verification complete — document is authentic</div>
+            </div>
+            <div class="verify-btn-row">
+              <button class="btn btn-ghost btn-sm" onclick="toast('Document re-verification initiated','info')">Re-verify Document</button>
+              <button class="btn btn-ghost btn-sm" onclick="toast('Document downloaded','info')">Download PDF</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- s-class12 -->
+        <div class="page" id="s-class12">
+          <div class="page-header"><h1 class="page-title">📗 Class 12 Verification</h1><p class="page-sub">Verify your higher secondary records</p></div>
+          <div class="verify-section">
+            <div class="verify-header">
+              <div class="verify-title">School Details</div>
+              <span class="status-badge badge-verified">✓ Verified</span>
+            </div>
+            <div class="form-row">
+              <div>
+                <div class="field-mini-label">School Name</div>
+                <input class="field-input" value="Delhi Public School, R.K. Puram" readonly>
+              </div>
+              <div>
+                <div class="field-mini-label">Roll Number</div>
+                <input class="field-input" value="CBSE/2021/0034521" readonly>
+              </div>
+            </div>
+            <div class="inline-verify-row">
+              <span class="status-badge badge-verified">✓ Matched with CBSE Database</span>
+            </div>
+          </div>
+          <div class="verify-section">
+            <div class="verify-header">
+              <div class="verify-title">Add New Record</div>
+            </div>
+            <div class="form-row">
+              <div>
+                <div class="field-mini-label">School Name</div>
+                <input class="field-input" id="c12-school" placeholder="Enter school name">
+              </div>
+              <div>
+                <div class="field-mini-label">Roll Number</div>
+                <input class="field-input" id="c12-roll" placeholder="Board roll number">
+              </div>
+            </div>
+            <div class="upload-zone" onclick="simulateUpload('c12')">
+              <div class="upload-zone-icon">📄</div>
+              <div class="upload-zone-text">Click to upload Class 12 Marksheet</div>
+              <div class="upload-zone-hint">PDF only · Max 10MB</div>
+            </div>
+            <div class="verify-btn-row">
+              <button class="btn btn-primary btn-sm" onclick="verifyAcademic('class12')">Verify with Board →</button>
+            </div>
+            <div id="c12-result" style="margin-top:10px"></div>
+          </div>
+        </div>
+
+        <!-- s-college -->
+        <div class="page" id="s-college">
+          <div class="page-header"><h1 class="page-title">🎓 College Verification</h1><p class="page-sub">Verify your undergraduate/postgraduate enrollment</p></div>
+          <div class="verify-section">
+            <div class="verify-header">
+              <div class="verify-title">College Details</div>
+              <span class="status-badge badge-pending">⏳ Pending</span>
+            </div>
+            <div class="form-row">
+              <div>
+                <div class="field-mini-label">College Name</div>
+                <input class="field-input" id="col-name" value="IIT Bombay" placeholder="College name">
+              </div>
+              <div>
+                <div class="field-mini-label">Registration ID</div>
+                <input class="field-input" id="col-reg" value="IITB/CSE/2022/B1234" placeholder="Enrollment number">
+              </div>
+            </div>
+            <div class="form-row full">
+              <div>
+                <div class="field-mini-label">Student Name (as per records)</div>
+                <input class="field-input" id="col-sname" value="Aryan Sharma" placeholder="Full name">
+              </div>
+            </div>
+            <div class="upload-zone" onclick="simulateUpload('college')">
+              <div class="upload-zone-icon">📄</div>
+              <div class="upload-zone-text">Upload Enrollment Certificate / ID Card</div>
+              <div class="upload-zone-hint">PDF only · Max 10MB</div>
+            </div>
+            <div class="verify-btn-row">
+              <button class="btn btn-primary btn-sm" onclick="verifyAcademic('college')">Verify with University →</button>
+            </div>
+            <div id="college-result" style="margin-top:10px"></div>
+          </div>
+        </div>
+
+        <!-- s-certs -->
+        <div class="page" id="s-certs">
+          <div class="page-header"><h1 class="page-title">🏆 My Certificates</h1><p class="page-sub">All your verified professional certificates</p></div>
+          <div class="cert-detail" onclick="openCertModal('AWS Certified Solutions Architect','Amazon Web Services','Cloud Computing — demonstrates proficiency in designing scalable AWS infrastructure','Feb 2024','Expires Feb 2027')">
+            <div class="cert-detail-header">
+              <div>
+                <div class="cert-detail-title">AWS Certified Solutions Architect</div>
+                <div class="cert-detail-sub">Amazon Web Services · Feb 2024</div>
+              </div>
+              <span class="status-badge badge-verified">✓ Verified</span>
+            </div>
+            <div class="cert-meta">
+              <div class="cert-meta-item"><div class="cert-meta-key">Issuer</div><div class="cert-meta-val">Amazon Web Services</div></div>
+              <div class="cert-meta-item"><div class="cert-meta-key">Purpose</div><div class="cert-meta-val">Cloud Architecture</div></div>
+              <div class="cert-meta-item"><div class="cert-meta-key">Cert ID</div><div class="cert-meta-val" style="font-family:var(--font-mono);font-size:12px">AWS-SAA-C03-X9821</div></div>
+              <div class="cert-meta-item"><div class="cert-meta-key">Validity</div><div class="cert-meta-val">Until Feb 2027</div></div>
+            </div>
+          </div>
+          <div class="cert-detail" onclick="openCertModal('Google Data Analytics','Google LLC','Data Analytics — covers data analysis using spreadsheets, SQL, R, and Tableau','Dec 2023','No expiry')">
+            <div class="cert-detail-header">
+              <div>
+                <div class="cert-detail-title">Google Data Analytics Certificate</div>
+                <div class="cert-detail-sub">Google LLC · Dec 2023</div>
+              </div>
+              <span class="status-badge badge-verified">✓ Verified</span>
+            </div>
+            <div class="cert-meta">
+              <div class="cert-meta-item"><div class="cert-meta-key">Issuer</div><div class="cert-meta-val">Google LLC</div></div>
+              <div class="cert-meta-item"><div class="cert-meta-key">Purpose</div><div class="cert-meta-val">Data Analytics</div></div>
+              <div class="cert-meta-item"><div class="cert-meta-key">Cert ID</div><div class="cert-meta-val" style="font-family:var(--font-mono);font-size:12px">GDA-2023-PRO-4491</div></div>
+              <div class="cert-meta-item"><div class="cert-meta-key">Validity</div><div class="cert-meta-val">Lifetime</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- s-verify-cert -->
+        <div class="page" id="s-verify-cert">
+          <div class="page-header"><h1 class="page-title">🔍 Verify Certificate</h1><p class="page-sub">Check authenticity of any certificate against company database</p></div>
+          <div class="verify-section">
+            <div class="verify-header"><div class="verify-title">Certificate Details</div></div>
+            <div class="form-row">
+              <div>
+                <div class="field-mini-label">Company / Issuing Body</div>
+                <input class="field-input" id="vc-company" placeholder="e.g. Google, Coursera, NPTEL">
+              </div>
+              <div>
+                <div class="field-mini-label">Certificate ID</div>
+                <input class="field-input" id="vc-certid" placeholder="Certificate number">
+              </div>
+            </div>
+            <div class="upload-zone" id="vc-drop" onclick="simulateUpload('vcert')">
+              <div class="upload-zone-icon">📄</div>
+              <div class="upload-zone-text">Upload Certificate PDF</div>
+              <div class="upload-zone-hint">Our AI will analyze metadata, signatures, and formatting</div>
+            </div>
+            <div class="verify-btn-row">
+              <button class="btn btn-primary btn-sm" onclick="verifyCertificate()">Verify Authenticity →</button>
+            </div>
+            <div id="vc-result" style="margin-top:14px"></div>
+          </div>
+          <div class="verify-section">
+            <div class="verify-header"><div class="verify-title">Recent Verifications</div></div>
+            <table class="data-table">
+              <thead><tr><th>Certificate</th><th>Company</th><th>Result</th><th>Date</th></tr></thead>
+              <tbody>
+                <tr><td>Solutions Architect</td><td>AWS</td><td><span class="status-badge badge-verified">✓ Authentic</span></td><td>Feb 2024</td></tr>
+                <tr><td>Data Analytics Pro</td><td>Google</td><td><span class="status-badge badge-verified">✓ Authentic</span></td><td>Dec 2023</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RECRUITER DASHBOARD -->
+<div id="screen-recruiter" class="screen">
+  <div class="dash-shell">
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <div style="width:28px;height:28px;background:linear-gradient(135deg,var(--accent-teal),var(--accent-blue));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px">💼</div>
+          <div class="sidebar-logo-name">EduVerify</div>
+        </div>
+        <div class="sidebar-logo-sub">Recruiter Portal</div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Overview</div>
+        <div class="nav-item active" onclick="navToR('r-dashboard',this)"><div class="nav-dot"></div>🏠 Dashboard</div>
+        <div class="nav-item" onclick="navToR('r-search',this)"><div class="nav-dot"></div>🔍 Search Student</div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Company</div>
+        <div class="nav-item" onclick="navToR('r-company',this)"><div class="nav-dot"></div>🏢 Company Profile</div>
+        <div class="nav-item" onclick="navToR('r-history',this)"><div class="nav-dot"></div>📋 Verification Logs</div>
+      </div>
+      <div class="sidebar-footer">
+        <div class="user-pill">
+          <div class="user-avatar" style="background:linear-gradient(135deg,var(--accent-teal),var(--accent-blue))">R</div>
+          <div>
+            <div class="user-name">Rahul Verma</div>
+            <div class="user-role" style="color:var(--accent-teal)">recruiter · TCS</div>
+          </div>
+          <div class="logout-btn" onclick="logout()">↩</div>
+        </div>
+      </div>
+    </div>
+    <div class="main-area">
+      <div class="main-inner">
+
+        <!-- r-dashboard -->
+        <div class="page active" id="r-dashboard">
+          <div class="page-header"><h1 class="page-title">Recruiter Dashboard 💼</h1><p class="page-sub">TCS — Talent Acquisition · Verified Recruiter</p></div>
+          <div class="stat-grid">
+            <div class="stat-card"><div class="stat-val" style="color:var(--accent-teal)">24</div><div class="stat-label">Students Checked</div></div>
+            <div class="stat-card"><div class="stat-val" style="color:var(--green)">21</div><div class="stat-label">Fully Verified</div></div>
+            <div class="stat-card"><div class="stat-val" style="color:var(--accent-amber)">3</div><div class="stat-label">Flagged</div></div>
+            <div class="stat-card"><div class="stat-val" style="color:var(--accent-violet)">8</div><div class="stat-label">Hired</div></div>
+          </div>
+          <div class="verify-section">
+            <div class="verify-header"><div class="verify-title">🏢 Recruiter Status</div><span class="status-badge badge-verified">✓ Verified Recruiter</span></div>
+            <table class="data-table">
+              <thead><tr><th>Field</th><th>Value</th></tr></thead>
+              <tbody>
+                <tr><td style="color:var(--muted);font-size:12px;font-family:var(--font-mono)">Company</td><td>Tata Consultancy Services Ltd.</td></tr>
+                <tr><td style="color:var(--muted);font-size:12px;font-family:var(--font-mono)">Recruiter ID</td><td style="font-family:var(--font-mono);font-size:12px">TCS-HR-MUM-8821</td></tr>
+                <tr><td style="color:var(--muted);font-size:12px;font-family:var(--font-mono)">Verified Via</td><td>MCA Company Database</td></tr>
+                <tr><td style="color:var(--muted);font-size:12px;font-family:var(--font-mono)">Access Level</td><td>Academic Records + Certificates</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="verify-section">
+            <div class="verify-header"><div class="verify-title">🚨 Fraud Alerts</div><span class="status-badge badge-pending">1 Active</span></div>
+            <div style="background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2);border-radius:10px;padding:1rem;font-size:13px;color:var(--accent-amber)">
+              ⚠️ Student STU-X9F2-3K12 has a certificate with mismatched issuer metadata. Flagged for fraud review.
+            </div>
+          </div>
+        </div>
+
+        <!-- r-search -->
+        <div class="page" id="r-search">
+          <div class="page-header"><h1 class="page-title">🔍 Search Student</h1><p class="page-sub">Enter a student's unique ID to view their verified credentials</p></div>
+          <div class="verify-section">
+            <div class="verify-header"><div class="verify-title">Student Lookup</div></div>
+            <div class="search-bar">
+              <input class="field-input search-input" id="r-uid-input" placeholder="Enter Student ID e.g. STU-A8F3-2D91-7C45-E6B2">
+              <button class="btn btn-teal btn-sm" onclick="searchStudent()">Search →</button>
+            </div>
+            <div style="font-size:12px;color:var(--muted);font-family:var(--font-mono)">Try: STU-A8F3-2D91-7C45-E6B2</div>
+          </div>
+          <div id="r-student-result" style="display:none">
+            <div class="recruiter-search-result">
+              <div class="rs-profile">
+                <div class="rs-avatar">A</div>
+                <div>
+                  <div style="font-size:17px;font-weight:600;margin-bottom:4px">Aryan Sharma</div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <span class="status-badge badge-verified">✓ Identity Verified</span>
+                    <span class="status-badge badge-info">Trust Score: 87%</span>
+                  </div>
+                  <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:6px">STU-A8F3-2D91-7C45-E6B2</div>
+                </div>
+              </div>
+              <div class="section-tab-row">
+                <div class="section-tab active" onclick="switchTab(this,'rt-academic')">Academic Records</div>
+                <div class="section-tab" onclick="switchTab(this,'rt-certs')">Certificates</div>
+              </div>
+              <div id="rt-academic" class="section-tab-content active">
+                <table class="data-table">
+                  <thead><tr><th>Record</th><th>Institution</th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr><td>Class 10</td><td>DPS R.K. Puram · CBSE</td><td><span class="status-badge badge-verified">✓ Verified</span></td></tr>
+                    <tr><td>Class 12</td><td>DPS R.K. Puram · CBSE</td><td><span class="status-badge badge-verified">✓ Verified</span></td></tr>
+                    <tr><td>B.Tech CSE</td><td>IIT Bombay</td><td><span class="status-badge badge-pending">⏳ Pending</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div id="rt-certs" class="section-tab-content">
+                <div class="cert-detail" onclick="openCertModal('AWS Certified Solutions Architect','Amazon Web Services','Cloud Computing — demonstrates proficiency in designing scalable AWS infrastructure','Feb 2024','Expires Feb 2027')">
+                  <div class="cert-detail-header">
+                    <div><div class="cert-detail-title">AWS Certified Solutions Architect</div><div class="cert-detail-sub">Amazon Web Services · Click to view full details</div></div>
+                    <span class="status-badge badge-verified">✓ Verified</span>
+                  </div>
+                </div>
+                <div class="cert-detail" onclick="openCertModal('Google Data Analytics','Google LLC','Data Analytics — covers SQL, R, Tableau, and data storytelling','Dec 2023','No expiry')">
+                  <div class="cert-detail-header">
+                    <div><div class="cert-detail-title">Google Data Analytics Certificate</div><div class="cert-detail-sub">Google LLC · Click to view full details</div></div>
+                    <span class="status-badge badge-verified">✓ Verified</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- r-company -->
+        <div class="page" id="r-company">
+          <div class="page-header"><h1 class="page-title">🏢 Company Profile</h1><p class="page-sub">Your recruiter verification details</p></div>
+          <div class="verify-section">
+            <div class="verify-header"><div class="verify-title">Company Details</div><span class="status-badge badge-verified">✓ Verified</span></div>
+            <div class="form-row">
+              <div><div class="field-mini-label">Company Name</div><input class="field-input" value="Tata Consultancy Services" readonly></div>
+              <div><div class="field-mini-label">CIN Number</div><input class="field-input" value="L22210MH1995PLC084781" readonly></div>
+            </div>
+            <div class="form-row">
+              <div><div class="field-mini-label">Your Name</div><input class="field-input" value="Rahul Verma" readonly></div>
+              <div><div class="field-mini-label">Designation</div><input class="field-input" value="Senior Talent Acquisition" readonly></div>
+            </div>
+            <div style="font-size:12px;color:var(--muted);padding-top:4px">Verified against Ministry of Corporate Affairs (MCA21) database on March 10, 2024.</div>
+          </div>
+        </div>
+
+        <!-- r-history -->
+        <div class="page" id="r-history">
+          <div class="page-header"><h1 class="page-title">📋 Verification Logs</h1><p class="page-sub">All student profile accesses and checks</p></div>
+          <div class="verify-section">
+            <table class="data-table">
+              <thead><tr><th>Student ID</th><th>Action</th><th>Result</th><th>Date</th></tr></thead>
+              <tbody>
+                <tr><td style="font-family:var(--font-mono);font-size:11px">STU-A8F3-2D91</td><td>Full Profile View</td><td><span class="status-badge badge-verified">Trusted</span></td><td>Apr 24, 2026</td></tr>
+                <tr><td style="font-family:var(--font-mono);font-size:11px">STU-B3C7-8E12</td><td>Certificate Check</td><td><span class="status-badge badge-verified">Authentic</span></td><td>Apr 22, 2026</td></tr>
+                <tr><td style="font-family:var(--font-mono);font-size:11px">STU-X9F2-3K12</td><td>Certificate Check</td><td><span class="status-badge badge-unverified">⚠ Flagged</span></td><td>Apr 21, 2026</td></tr>
+                <tr><td style="font-family:var(--font-mono);font-size:11px">STU-D5E1-4F90</td><td>Academic Records</td><td><span class="status-badge badge-verified">Trusted</span></td><td>Apr 19, 2026</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- UNIVERSITY DASHBOARD -->
+<div id="screen-university" class="screen">
+  <div class="dash-shell">
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <div style="width:28px;height:28px;background:linear-gradient(135deg,var(--accent-violet),var(--accent-blue));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px">🏛️</div>
+          <div class="sidebar-logo-name">EduVerify</div>
+        </div>
+        <div class="sidebar-logo-sub">University Portal</div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Overview</div>
+        <div class="nav-item active" onclick="navToU('u-dashboard',this)"><div class="nav-dot"></div>🏠 Dashboard</div>
+        <div class="nav-item" onclick="navToU('u-upload',this)"><div class="nav-dot"></div>📤 Issue Certificate</div>
+        <div class="nav-item" onclick="navToU('u-issued',this)"><div class="nav-dot"></div>📋 Issued Records</div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Admin</div>
+        <div class="nav-item" onclick="navToU('u-students',this)"><div class="nav-dot"></div>👥 Student Registry</div>
+        <div class="nav-item" onclick="navToU('u-audit',this)"><div class="nav-dot"></div>🔍 Audit Logs</div>
+      </div>
+      <div class="sidebar-footer">
+        <div class="user-pill">
+          <div class="user-avatar" style="background:linear-gradient(135deg,var(--accent-violet),var(--accent-blue))">I</div>
+          <div>
+            <div class="user-name">IIT Bombay</div>
+            <div class="user-role" style="color:var(--accent-violet)">university</div>
+          </div>
+          <div class="logout-btn" onclick="logout()">↩</div>
+        </div>
+      </div>
+    </div>
+    <div class="main-area">
+      <div class="main-inner">
+
+        <!-- u-dashboard -->
+        <div class="page active" id="u-dashboard">
+          <div class="page-header"><h1 class="page-title">University Dashboard 🏛️</h1><p class="page-sub">IIT Bombay — NAAC Grade A++ · UGC Verified Institution</p></div>
+          <div class="stat-grid">
+            <div class="stat-card"><div class="stat-val" style="color:var(--accent-violet)">1,248</div><div class="stat-label">Certificates Issued</div></div>
+            <div class="stat-card"><div class="stat-val" style="color:var(--green)">892</div><div class="stat-label">Verifications Done</div></div>
+            <div class="stat-card"><div class="stat-val" style="color:var(--accent-teal)">94</div><div class="stat-label">Active Students</div></div>
+            <div class="stat-card"><div class="stat-val" style="color:var(--accent-amber)">3</div><div class="stat-label">Disputes Open</div></div>
+          </div>
+          <div class="verify-section">
+            <div class="verify-header"><div class="verify-title">🏛️ Institution Verification</div><span class="status-badge badge-verified">✓ Gov. Verified</span></div>
+            <table class="data-table">
+              <thead><tr><th>Field</th><th>Value</th></tr></thead>
+              <tbody>
+                <tr><td style="color:var(--muted);font-size:12px;font-family:var(--font-mono)">Institution</td><td>Indian Institute of Technology Bombay</td></tr>
+                <tr><td style="color:var(--muted);font-size:12px;font-family:var(--font-mono)">NAAC Grade</td><td>A++ (Cycle 4)</td></tr>
+                <tr><td style="color:var(--muted);font-size:12px;font-family:var(--font-mono)">UGC ID</td><td style="font-family:var(--font-mono);font-size:12px">UGC-1959-IITB-MUM-AU</td></tr>
+                <tr><td style="color:var(--muted);font-size:12px;font-family:var(--font-mono)">Verification</td><td>Ministry of Education Database</td></tr>
+                <tr><td style="color:var(--muted);font-size:12px;font-family:var(--font-mono)">Storage</td><td>Private Encrypted Vault (AES-256)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- u-upload -->
+        <div class="page" id="u-upload">
+          <div class="page-header"><h1 class="page-title">📤 Issue Certificate</h1><p class="page-sub">Upload and register certificates into the secure verification database</p></div>
+          <div class="univ-cert-upload">
+            <div class="verify-header"><div class="verify-title">Certificate Details</div></div>
+            <div class="form-row">
+              <div><div class="field-mini-label">Student ID</div><input class="field-input" id="u-stuid" placeholder="STU-XXXX-XXXX-XXXX"></div>
+              <div><div class="field-mini-label">Student Name</div><input class="field-input" id="u-stuname" placeholder="Full name as per records"></div>
+            </div>
+            <div class="form-row">
+              <div><div class="field-mini-label">Certificate Type</div>
+                <select class="field-input" id="u-certtype">
+                  <option>Degree Certificate</option>
+                  <option>Transcript</option>
+                  <option>Internship Completion</option>
+                  <option>Achievement Award</option>
+                  <option>Course Completion</option>
+                </select>
+              </div>
+              <div><div class="field-mini-label">Issue Date</div><input class="field-input" id="u-date" type="date"></div>
+            </div>
+            <div class="form-row full">
+              <div><div class="field-mini-label">Certificate Description</div><input class="field-input" id="u-desc" placeholder="Purpose and scope of this certificate"></div>
+            </div>
+            <div class="upload-zone" onclick="simulateUpload('univ')">
+              <div class="upload-zone-icon">🔒</div>
+              <div class="upload-zone-text">Upload Certificate PDF (Private Storage)</div>
+              <div class="upload-zone-hint">Stored in encrypted private vault · Not publicly visible · Used for verification only</div>
+            </div>
+            <div class="verify-btn-row">
+              <button class="btn btn-violet btn-sm" onclick="issueCertificate()">Issue & Register Certificate →</button>
+            </div>
+            <div id="u-issue-result" style="margin-top:10px"></div>
+          </div>
+        </div>
+
+        <!-- u-issued -->
+        <div class="page" id="u-issued">
+          <div class="page-header"><h1 class="page-title">📋 Issued Records</h1><p class="page-sub">All certificates issued by your institution</p></div>
+          <div class="verify-section">
+            <div id="issued-list">
+              <div class="issued-list-item">
+                <div class="issued-icon">🎓</div>
+                <div>
+                  <div class="issued-name">Degree Certificate — B.Tech CSE</div>
+                  <div class="issued-meta">Aryan Sharma · STU-A8F3-2D91 · Issued: May 2024</div>
+                </div>
+                <div class="issued-actions">
+                  <span class="status-badge badge-verified">✓ Active</span>
+                  <button class="btn btn-ghost btn-sm" onclick="toast('Certificate revoked','error')">Revoke</button>
+                </div>
+              </div>
+              <div class="issued-list-item">
+                <div class="issued-icon">📄</div>
+                <div>
+                  <div class="issued-name">Academic Transcript 2020-2024</div>
+                  <div class="issued-meta">Priya Nair · STU-B3C7-8E12 · Issued: May 2024</div>
+                </div>
+                <div class="issued-actions">
+                  <span class="status-badge badge-verified">✓ Active</span>
+                  <button class="btn btn-ghost btn-sm" onclick="toast('Certificate revoked','error')">Revoke</button>
+                </div>
+              </div>
+              <div class="issued-list-item">
+                <div class="issued-icon">🏆</div>
+                <div>
+                  <div class="issued-name">Excellence Award — Research 2023</div>
+                  <div class="issued-meta">Rohan Mehta · STU-D5E1-4F90 · Issued: Dec 2023</div>
+                </div>
+                <div class="issued-actions">
+                  <span class="status-badge badge-verified">✓ Active</span>
+                  <button class="btn btn-ghost btn-sm" onclick="toast('Certificate revoked','error')">Revoke</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- u-students -->
+        <div class="page" id="u-students">
+          <div class="page-header"><h1 class="page-title">👥 Student Registry</h1><p class="page-sub">All enrolled students linked to your institution</p></div>
+          <div class="verify-section">
+            <table class="data-table">
+              <thead><tr><th>Student ID</th><th>Name</th><th>Program</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td style="font-family:var(--font-mono);font-size:11px">STU-A8F3-2D91</td><td>Aryan Sharma</td><td>B.Tech CSE</td><td><span class="status-badge badge-verified">Active</span></td></tr>
+                <tr><td style="font-family:var(--font-mono);font-size:11px">STU-B3C7-8E12</td><td>Priya Nair</td><td>M.Tech AI</td><td><span class="status-badge badge-verified">Active</span></td></tr>
+                <tr><td style="font-family:var(--font-mono);font-size:11px">STU-D5E1-4F90</td><td>Rohan Mehta</td><td>PhD CS</td><td><span class="status-badge badge-verified">Active</span></td></tr>
+                <tr><td style="font-family:var(--font-mono);font-size:11px">STU-X9F2-3K12</td><td>Anita Gupta</td><td>B.Tech EE</td><td><span class="status-badge badge-pending">Alumni</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- u-audit -->
+        <div class="page" id="u-audit">
+          <div class="page-header"><h1 class="page-title">🔍 Audit Logs</h1><p class="page-sub">All verification requests against your institution's records</p></div>
+          <div class="verify-section">
+            <table class="data-table">
+              <thead><tr><th>Requester</th><th>Student</th><th>Data Accessed</th><th>Result</th><th>Time</th></tr></thead>
+              <tbody>
+                <tr><td style="font-size:12px">TCS Recruiter</td><td style="font-family:var(--font-mono);font-size:11px">STU-A8F3</td><td>Degree + Transcript</td><td><span class="status-badge badge-verified">Matched</span></td><td>Apr 24, 2026</td></tr>
+                <tr><td style="font-size:12px">Infosys Recruiter</td><td style="font-family:var(--font-mono);font-size:11px">STU-B3C7</td><td>Degree</td><td><span class="status-badge badge-verified">Matched</span></td><td>Apr 22, 2026</td></tr>
+                <tr><td style="font-size:12px">Wipro Recruiter</td><td style="font-family:var(--font-mono);font-size:11px">STU-X9F2</td><td>Certificate</td><td><span class="status-badge badge-unverified">⚠ Mismatch</span></td><td>Apr 21, 2026</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CERT MODAL -->
+<div id="cert-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:none;align-items:center;justify-content:center">
+  <div class="modal-box">
+    <div class="modal-title">
+      🏆 Certificate Details
+      <div class="modal-close" onclick="closeCertModal()">×</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem">
+      <div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:4px" id="m-title">—</div>
+        <div style="font-size:13px;color:var(--muted);font-family:var(--font-mono)" id="m-issuer">—</div>
+      </div>
+      <span class="status-badge badge-verified">✓ Verified</span>
+    </div>
+    <hr class="divider">
+    <div style="margin-bottom:1rem">
+      <div style="font-size:10px;color:var(--muted);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Purpose of Certificate</div>
+      <div style="font-size:14px;line-height:1.6;color:var(--text)" id="m-purpose">—</div>
+    </div>
+    <div class="cert-meta">
+      <div class="cert-meta-item"><div class="cert-meta-key">Issued</div><div class="cert-meta-val" id="m-issued">—</div></div>
+      <div class="cert-meta-item"><div class="cert-meta-key">Validity</div><div class="cert-meta-val" id="m-valid">—</div></div>
+      <div class="cert-meta-item"><div class="cert-meta-key">Blockchain Hash</div><div class="cert-meta-val" style="font-family:var(--font-mono);font-size:11px">0x8f3a...d912</div></div>
+      <div class="cert-meta-item"><div class="cert-meta-key">Verification Stamp</div><div class="cert-meta-val" style="color:var(--green)">✓ AI Authenticated</div></div>
+    </div>
+    <hr class="divider">
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-ghost" onclick="closeCertModal()">Close</button>
+      <button class="btn btn-primary" onclick="toast('Certificate downloaded','success')">Download PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- TERMINAL MODAL -->
+<div id="terminal-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(5px)">
+  <div style="width:550px; max-width:90%; background:#0a0a0a; border:1px solid #333; border-radius:8px; overflow:hidden; font-family:monospace; box-shadow: 0 10px 40px rgba(0,0,0,0.7);">
+    <div style="background:#1a1a1a; padding:8px 12px; border-bottom:1px solid #333; display:flex; align-items:center; gap:6px;">
+      <div style="width:12px;height:12px;border-radius:50%;background:#ff5f56"></div>
+      <div style="width:12px;height:12px;border-radius:50%;background:#ffbd2e"></div>
+      <div style="width:12px;height:12px;border-radius:50%;background:#27c93f"></div>
+      <div style="color:#888; font-size:12px; margin-left:10px; letter-spacing:1px;" id="term-title">Ledger Query</div>
+    </div>
+    <div style="padding:16px; color:#0f0; font-size:13px; line-height:1.6; height:220px; overflow-y:auto; text-shadow: 0 0 5px rgba(0,255,0,0.3);" id="term-body">
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+
+</body>
+</html>
