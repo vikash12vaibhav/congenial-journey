@@ -1,10 +1,10 @@
 # congenial-journey
 
 
-Team Name:- Logic Legends
+Team Name:- Logic Legends.
 
 
-Team Code- UDB-T7RP
+Team Code:- UDB-T7RP
 
 
-PS_07:- Decentralized identity for students and job seekers
+PS_07:- Decentralized identity for students and job seekers.
